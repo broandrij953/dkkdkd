@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pepe Clicker Game</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      background-color: black;
+      color: white;
+      font-family: sans-serif;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      padding: 10px;
+    }
+    .top-box {
+      background: #333;
+      border-radius: 15px;
+      padding: 8px 16px;
+      text-align: center;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .pepe {
+      width: 120px;
+      height: 120px;
+      background-image: url('./images/pepe.png');
+      background-size: cover;
+      cursor: pointer;
+      position: relative;
+    }
+    .stars-float {
+      position: absolute;
+      font-size: 16px;
+      animation: floatUp 1s ease forwards;
+      color: yellow;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-40px); }
+    }
+    .energy-bar {
+      width: 20px;
+      height: 200px;
+      background: grey;
+      border-radius: 10px;
+      position: relative;
+    }
+    .energy-fill {
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+      background: linear-gradient(orange, yellow);
+      border-radius: 10px;
+    }
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      padding: 10px;
+      background: #111;
+    }
+    .bottom-nav img {
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="top-box" id="level">Level 1</div>
+    <div class="top-box" id="stars">0 ⭐</div>
+    <div class="top-box" id="referrals">0 👥</div>
+  </div>
+
+  <div class="main">
+    <img src="./images/telegram.png" style="width: 40px; margin-bottom: 20px;" onclick="window.open('https://t.me/fancynftchanel')" />
+    <img src="./images/gift.png" style="width: 40px; margin-bottom: 20px;" onclick="redeemCode()" />
+
+    <div class="pepe" onclick="tapPepe(event)"></div>
+
+    <div class="energy-bar">
+      <div class="energy-fill" id="energyFill" style="height: 50%;"></div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <img src="./images/bag.png" />
+    <img src="./images/referrals.png" />
+    <img src="./images/house.png" />
+    <img src="./images/quests.png" />
+    <img src="./images/store.png" />
+  </div>
+
+  <script>
+    let stars = parseFloat(localStorage.getItem('stars')) || 0;
+    let level = parseInt(localStorage.getItem('level')) || 1;
+    let referrals = parseInt(localStorage.getItem('referrals')) || 0;
+    let energy = parseInt(localStorage.getItem('energy')) || 5000;
+
+    function updateUI() {
+      document.getElementById('stars').innerText = stars.toFixed(3) + ' ⭐';
+      document.getElementById('level').innerText = 'Level ' + level;
+      document.getElementById('referrals').innerText = referrals + ' 👥';
+      document.getElementById('energyFill').style.height = Math.min(energy / 10000 * 100, 100) + '%';
+    }
+
+    function tapPepe(e) {
+      if (energy <= 0) return;
+      stars += 0.0001;
+      energy -= 1;
+      showStar(e.clientX, e.clientY);
+      save();
+      updateUI();
+    }
+
+    function showStar(x, y) {
+      const star = document.createElement('div');
+      star.className = 'stars-float';
+      star.innerText = '+0.0001⭐';
+      document.body.appendChild(star);
+      star.style.left = x + 'px';
+      star.style.top = y + 'px';
+      setTimeout(() => star.remove(), 1000);
+    }
+
+    function redeemCode() {
+      const code = prompt("Enter your promo code:");
+      if (code === 'FREE10') {
+        stars += 10;
+        alert('You got 10 ⭐!');
+        save();
+        updateUI();
+      } else {
+        alert('Invalid code');
+      }
+    }
+
+    function save() {
+      localStorage.setItem('stars', stars);
+      localStorage.setItem('level', level);
+      localStorage.setItem('referrals', referrals);
+      localStorage.setItem('energy', energy);
+    }
+
+    // Energy Regen
+    setInterval(() => {
+      if (energy < 10000) {
+        energy++;
+        save();
+        updateUI();
+      }
+    }, 2000);
+
+    updateUI();
+  </script>
+</body>
+</html>
